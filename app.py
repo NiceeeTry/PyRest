@@ -15,6 +15,7 @@ def create_app():
 
 def register_extensions(app):
     db.init_app(app)
+    app.app_context().push()
     migrate = Migrate(app,db)
     
 def register_resources(app):
