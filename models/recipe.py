@@ -1,11 +1,4 @@
 from extensions import db
-recipe_list = []
-def get_last_id():
-    if recipe_list:
-        last_recipe = recipe_list[-1]
-    else:
-        return 1
-    return last_recipe.id+1
 
 class Recipe(db.Model):
     __tablename__='recipe'
@@ -20,6 +13,33 @@ class Recipe(db.Model):
     created_at=db.Column(db.DateTime(), nullable=False,server_default=db.func.now())
     updated_at = db.Column(db.DateTime(),nullable=False,server_default=db.func.now(),onupdate=db.func.now())
     user_id = db.Column(db.Integer(),db.ForeignKey("user.id"))
+    
+    def data(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'description':self.description,
+            'num_of_servings':self.num_of_servings,
+            'cook_time':self.cook_time,
+            'directions':self.directions,
+            'user_id':self.user_id
+        }
+        
+    @classmethod
+    def get_all_published(cls):
+        return cls.query.filter_by(is_publish=True).all()
+    
+    @classmethod
+    def get_by_id(cls, recipe_id):
+        return cls.query.filter_by(id = recipe_id).first()
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
     
     # def __init__(self, name, description, num_of_servings, cook_time, directions) -> None:
     #     self.id = get_last_id()
