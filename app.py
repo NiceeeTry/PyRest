@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 
 from config import Config
-from extensions import db
+from extensions import db, jwt
 
 from resources.user import UserListResource
 from resources.recipe import RecipeListResource, RecipeResource, RecipePublishResource
@@ -19,6 +19,7 @@ def register_extensions(app):
     db.init_app(app)
     app.app_context().push()
     migrate = Migrate(app,db)
+    jwt.init_app(app)
     
 def register_resources(app):
     api = Api(app)
