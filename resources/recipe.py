@@ -21,7 +21,7 @@ class RecipeListResource(Resource):
             name=json_data['name'],
             description=json_data['description'],
             num_of_servings=json_data['num_of_servings'],
-            cook_time=json_data['cook_time']
+            cook_time=json_data['cook_time'],
             directions=json_data['directions'],
             user_id=current_user
         )
