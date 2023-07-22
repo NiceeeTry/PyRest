@@ -13,19 +13,27 @@ user_public_schema = UserSchema(exclude=('email',))
 
 class UserListResource(Resource):
     def post(self):
+
         json_data = request.get_json()
 
-        data,errors = user_schema.load(data=json_data)
-        if errors:
-            return {'message':'Validation errors', 'errors':errors}, HTTPStatus.BAD_REQUEST
-        
+        # DOESNT WORK WITH ERRORS!!!
+
+        # data, errors = user_schema.load(data=json_data)
+        data = user_schema.load(data=json_data)
+
+        # if errors:
+        #     return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
+
         if User.get_by_username(data.get('username')):
-            return {'message':'username already used'}, HTTPStatus.BAD_REQUEST
+            return {'message': 'username already used'}, HTTPStatus.BAD_REQUEST
+
         if User.get_by_email(data.get('email')):
-            return {'message':'email already used'}, HTTPStatus.BAD_REQUEST
+            return {'message': 'email already used'}, HTTPStatus.BAD_REQUEST
+
         user = User(**data)
         user.save()
-        return user_schema.dump(user).data,HTTPStatus.CREATED
+
+        return user_schema.dump(user), HTTPStatus.CREATED
         # username = json_data.get('username')
         # # print(username)
         # email = json_data.get('email')

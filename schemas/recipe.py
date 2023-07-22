@@ -11,12 +11,14 @@ class RecipeSchema(Schema):
     is_publish=fields.Boolean(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-    num_of_servings = fields.Integer(validate=validate_num_of_servings)
+    # num_of_servings = fields.Integer(validate=validate_num_of_servings)
+    num_of_servings = fields.Integer()
     cook_time = fields.Integer()
     
     author = fields.Nested(UserSchema, attribute='user',dump_only=True, only=['id','username'])
     
-    def validate_num_of_servings(n):
+    @validates('num_of_servings')
+    def validate_num_of_servings(self,n):
         if n<1:
             raise ValidationError('Number of servings must be greater than 0.')
         if n>50:
