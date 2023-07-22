@@ -17,17 +17,18 @@ class RecipeListResource(Resource):
     def post(self):
         json_data = request.get_json()
         current_user = get_jwt_identity()
-        # DOESNT WORK WITH ERRORS!!!
         
-        # data, errors = recipe_schema.load(data=json_data)
-        data = recipe_schema.load(data=json_data)
-        # if errors:
-        #     return {"message":"Validation errors",'errors':errors}, HTTPStatus.BAD_REQUEST
+        try:
+            data = recipe_schema.load(data=json_data)
+        except Exception as err:
+            errors = err.messages
+            
+        if errors:
+            return {"message":"Validation errors",'errors':errors}, HTTPStatus.BAD_REQUEST
         recipe = Recipe(**data)
         recipe.user_id = current_user
         recipe.save()
-        return recipe_schema.dump(recipe),
-    HTTPStatus.CREATED
+        return recipe_schema.dump(recipe), HTTPStatus.CREATED
         # recipe = Recipe(
         #     name=json_data['name'],
         #     description=json_data['description'],
@@ -38,6 +39,34 @@ class RecipeListResource(Resource):
         # )
         # recipe.save()
         # return recipe.data(), HTTPStatus.CREATED
+    @jwt_required
+    def patch(self, recipe_id):
+        json_data = request.get_json()
+        try:
+            data = recipe_schema.load(data=json_data, partial=('name',))
+        except Exception as err:
+            errors = err.messages
+    
+        if errors:
+            return {'message':'Validation errors','errors':errors}, HTTPStatus.BAD_REQUEST
+        recipe = Recipe.get_by_id(recipe_id=recipe_id)
+        if recipe is None:
+            return {'message':'Recipe not found'}, HTTPStatus.NOT_FOUND
+        current_user = get_jwt_identity()
+        if current_user!=recipe.user_id:
+            return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
+        recipe.name = data.get('name') or recipe.name
+        recipe.description = data.get('description') or recipe.description
+        recipe.num_of_servings = data.get('num_of_servings') or recipe.num_of_servings
+
+        recipe.cook_time = data.get('cook_time') or recipe.cook_time
+
+        recipe.directions = data.get('directions') or recipe.directions
+        recipe.save()
+        return recipe_schema.dump(recipe), HTTPStatus.OK
+        
+            
+            
 
 class RecipeResource(Resource):
     @jwt_required(optional=True)

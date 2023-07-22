@@ -16,13 +16,13 @@ class UserListResource(Resource):
 
         json_data = request.get_json()
 
-        # DOESNT WORK WITH ERRORS!!!
-
-        # data, errors = user_schema.load(data=json_data)
         data = user_schema.load(data=json_data)
-
-        # if errors:
-        #     return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
+        try:
+            data = user_schema.load(data=json_data)
+        except Exception as err:
+            errors = err.messages
+            return {"message":"Validation errors",'errors':errors}, HTTPStatus.BAD_REQUEST
+       
 
         if User.get_by_username(data.get('username')):
             return {'message': 'username already used'}, HTTPStatus.BAD_REQUEST
