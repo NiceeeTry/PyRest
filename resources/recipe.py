@@ -22,9 +22,9 @@ class RecipeListResource(Resource):
             data = recipe_schema.load(data=json_data)
         except Exception as err:
             errors = err.messages
-            
-        if errors:
             return {"message":"Validation errors",'errors':errors}, HTTPStatus.BAD_REQUEST
+        
+        
         recipe = Recipe(**data)
         recipe.user_id = current_user
         recipe.save()
@@ -46,9 +46,8 @@ class RecipeListResource(Resource):
             data = recipe_schema.load(data=json_data, partial=('name',))
         except Exception as err:
             errors = err.messages
+            return {"message":"Validation errors",'errors':errors}, HTTPStatus.BAD_REQUEST
     
-        if errors:
-            return {'message':'Validation errors','errors':errors}, HTTPStatus.BAD_REQUEST
         recipe = Recipe.get_by_id(recipe_id=recipe_id)
         if recipe is None:
             return {'message':'Recipe not found'}, HTTPStatus.NOT_FOUND

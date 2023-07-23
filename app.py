@@ -5,11 +5,10 @@ from flask_restful import Api
 from config import Config
 from extensions import db, jwt
 
-from resources.user import UserListResource, UserResource, MeResource
+from resources.user import UserListResource, UserResource, MeResource, UserRecipeListResource
 from resources.recipe import RecipeListResource, RecipeResource, RecipePublishResource
 
 from resources.token import TokenResource, RefreshResourse,RevokeResource, black_list
-
 def create_app():
     app =  Flask(__name__)
     app.config.from_object(Config)
@@ -41,6 +40,7 @@ def register_resources(app):
     
     api.add_resource(UserListResource,'/users')
     api.add_resource(UserResource,'/users/<string:username>')
+    api.add_resource(UserRecipeListResource, '/users/<string:username>/recipes')
     
     api.add_resource(TokenResource,'/token')
     api.add_resource(RefreshResourse,'/refresh')
