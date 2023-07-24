@@ -10,12 +10,16 @@ from webargs import fields
 from webargs.flaskparser import use_kwargs
 from models.recipe import Recipe
 from mailgun import MailgunApi
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 user_schema = UserSchema()
 user_public_schema = UserSchema(exclude=('email',))
 recipe_list_schema = RecipeSchema(many=True)
-mailgun = MailgunApi(domain='sandbox9fffe912a8954c85a2a02c314af22279.mailgun.org',
-                     api_key='00e80b4c2cd48e64acc4608679e11ae1-c30053db-6f667482')
+mailgun = MailgunApi(domain=os.environ.get('MAILGUN_DOMAIN'),
+                     api_key=os.environ.get('MAILGUN_API_KEY'))
 
 class UserListResource(Resource):
     def post(self):

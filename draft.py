@@ -64,3 +64,7 @@
 
 # a = [int(i) for i in input().split()]
 # print(a)
+# import os
+# from dotenv import load_dotenv
+# load_dotenv()
+# print(os.environ.get('MAILGUN_API_KEY'))
