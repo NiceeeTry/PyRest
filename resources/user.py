@@ -1,4 +1,4 @@
-from flask import request, url_for
+from flask import request, url_for, render_template
 from flask_restful import Resource
 from http import HTTPStatus
 from utils import hash_password, generate_token, verify_token
@@ -12,6 +12,7 @@ from models.recipe import Recipe
 from mailgun import MailgunApi
 import os
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -46,7 +47,8 @@ class UserListResource(Resource):
         subject = 'Please confirm your registration.'
         link = url_for('useractivateresource', token=token, _external=True)
         text = 'Hi, Thanks for using SmileCook! Please confirm your registration by clicking on the link: {}'.format(link)
-        mailgun.send_email(to=user.email, subject=subject, text=text)
+        mailgun.send_email(to=user.email, subject=subject, text=text,
+                           html=render_template('email/confirmation.html', link=link))
         
 
         return user_schema.dump(user), HTTPStatus.CREATED
