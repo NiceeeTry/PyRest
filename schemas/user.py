@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields
 from utils import hash_password
+from flask import url_for
 
 class UserSchema(Schema):
     class Meta:
@@ -12,5 +13,12 @@ class UserSchema(Schema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
     
+    avatar_url = fields.Method(serialize='dump_avatar_url')
+    
+    def dump_avatar_url(self,user):
+        if user.avatar_image:
+            return url_for('static',filename='images/avatars/{}'.format(user.avatar_image),_external=True)
+        else:
+            return url_for('static',filename='images/assets/default-avatar.jpg',_external=True)
     def load_password(self, value):
         return hash_password(value)
