@@ -19,6 +19,6 @@ class UserSchema(Schema):
         if user.avatar_image:
             return url_for('static',filename='images/avatars/{}'.format(user.avatar_image),_external=True)
         else:
-            return url_for('static',filename='images/assets/default-avatar.jpg',_external=True)
+            return url_for('static',filename='images/assets/default-avatar.avif',_external=True)
     def load_password(self, value):
         return hash_password(value)
