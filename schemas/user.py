@@ -17,8 +17,10 @@ class UserSchema(Schema):
     
     def dump_avatar_url(self,user):
         if user.avatar_image:
-            return url_for('static',filename='images/avatars/{}'.format(user.avatar_image),_external=True)
+            link = url_for('static',filename='images/avatars/{}'.format(user.avatar_image),_external=True)
+            return link
         else:
-            return url_for('static',filename='images/assets/default-avatar.avif',_external=True)
+            link = url_for('static',filename='images/assets/default-avatar.avif',_external=True)
+            return link
     def load_password(self, value):
         return hash_password(value)
