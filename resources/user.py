@@ -140,15 +140,16 @@ class UserActivateResource(Resource):
         return {}, HTTPStatus.NO_CONTENT
     
 class UserAvatarUploadResource(Resource):
-    @jwt_required
+    @jwt_required()
     def put(self):
+        # print("i was here -----------------------")
         file = request.files.get('avatar')
         if not file:
             return {'message':'Not a valid image'},HTTPStatus.BAD_REQUEST
         
         if not image_set.file_allowed(file,file.filename):
             return {'message':'File type not allowed'}, HTTPStatus.BAD_REQUEST
-        print(file,"----------------------------------------------------")
+        # print(file,"----------------------------------------------------")
         user = User.get_by_id(id=get_jwt_identity())
         if user.avatar_image:
             avatar_path=image_set.path(folder='avatars',filename=user.avatar_image)
