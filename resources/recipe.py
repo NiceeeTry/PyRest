@@ -16,7 +16,7 @@ recipe_cover_schema = RecipeSchema(only=('cover_url',))
 recipe_pagination_schema = RecipePaginationSchema()
 
 class RecipeListResource(Resource):
-    @use_kwargs({'page':fields.Int(missing=1),'per_page':fields.Int(missing=20)})
+    @use_kwargs({'page':fields.Int(missing=1),'per_page':fields.Int(missing=2)})
     def get(self, page, per_page):
         paginated_recipes = Recipe.get_all_published(page, per_page)
         return recipe_pagination_schema.dump(paginated_recipes), HTTPStatus.OK
