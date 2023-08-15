@@ -19,6 +19,7 @@ class RecipeListResource(Resource):
     @use_kwargs({'page':fields.Int(missing=1),'per_page':fields.Int(missing=2)})
     def get(self, page, per_page):
         paginated_recipes = Recipe.get_all_published(page, per_page)
+        print(paginated_recipes,'-----')
         return recipe_pagination_schema.dump(paginated_recipes), HTTPStatus.OK
 
     @jwt_required()
@@ -47,7 +48,22 @@ class RecipeListResource(Resource):
         # )
         # recipe.save()
         # return recipe.data(), HTTPStatus.CREATED
-    @jwt_required
+ 
+            
+            
+
+class RecipeResource(Resource):
+    @jwt_required(optional=True)
+    def get(self,recipe_id):
+        recipe = Recipe.get_by_id(recipe_id=recipe_id)
+        if recipe is None:
+            return {'message':'Recipe not found'},HTTPStatus.NOT_FOUND
+        current_user = get_jwt_identity()
+        if recipe.is_publish == False and recipe.user_id != current_user:
+            return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
+        return recipe_schema.dump(recipe), HTTPStatus.OK
+
+    @jwt_required()
     def patch(self, recipe_id):
         json_data = request.get_json()
         try:
@@ -71,37 +87,25 @@ class RecipeListResource(Resource):
         recipe.directions = data.get('directions') or recipe.directions
         recipe.save()
         return recipe_schema.dump(recipe), HTTPStatus.OK
-        
-            
-            
+       
 
-class RecipeResource(Resource):
-    @jwt_required(optional=True)
-    def get(self,recipe_id):
-        recipe = Recipe.get_by_id(recipe_id=recipe_id)
-        if recipe is None:
-            return {'message':'Recipe not found'},HTTPStatus.NOT_FOUND
-        current_user = get_jwt_identity()
-        if recipe.is_publish == False and recipe.user_id != current_user:
-            return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
-        return recipe_schema.dump(recipe), HTTPStatus.OK
 
-    @jwt_required()
-    def put(self, recipe_id):
-        json_data = request.get_json()
-        recipe = Recipe.get_by_id(recipe_id=recipe_id)
-        if recipe is None:
-            return {'message':'Recipe not found'}, HTTPStatus.NOT_FOUND
-        current_user = get_jwt_identity()
-        if current_user != recipe.user_id:
-            return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
-        recipe.name = json_data['name']
-        recipe.description = json_data['description']
-        recipe.num_of_servings = json_data['num_of_servings']
-        recipe.cook_time = json_data['cook_time']
-        recipe.directions = json_data['directions']
-        recipe.save()
-        return recipe.data(), HTTPStatus.OK
+    # @jwt_required()
+    # def put(self, recipe_id):
+    #     json_data = request.get_json()
+    #     recipe = Recipe.get_by_id(recipe_id=recipe_id)
+    #     if recipe is None:
+    #         return {'message':'Recipe not found'}, HTTPStatus.NOT_FOUND
+    #     current_user = get_jwt_identity()
+    #     if current_user != recipe.user_id:
+    #         return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
+    #     recipe.name = json_data['name']
+    #     recipe.description = json_data['description']
+    #     recipe.num_of_servings = json_data['num_of_servings']
+    #     recipe.cook_time = json_data['cook_time']
+    #     recipe.directions = json_data['directions']
+    #     recipe.save()
+    #     return recipe.data(), HTTPStatus.OK
     
     @jwt_required()
     def delete(self, recipe_id):

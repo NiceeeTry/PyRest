@@ -29,7 +29,7 @@ class Recipe(db.Model):
     #     }
         
     @classmethod
-    def get_all_published(cls, page,per_page):
+    def get_all_published(cls, page, per_page):
         return cls.query.filter_by(is_publish=True).order_by(desc(cls.created_at)).paginate(page=page,per_page=per_page)
     
     @classmethod
