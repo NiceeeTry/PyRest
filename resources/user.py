@@ -107,7 +107,7 @@ class MeResource(Resource):
     
 class UserRecipeListResource(Resource):
     @jwt_required(optional=True)
-    @use_kwargs({'visibility':fields.Str()})
+    @use_kwargs({'visibility':fields.Str()},location="query")
     def get(self, username, visibility='all'):
         print(visibility,'--------------')
         user = User.get_by_username(username=username)
