@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 
 from config import Config
-from extensions import db, jwt, image_set
+from extensions import db, jwt, image_set, cache
 
 from resources.user import UserListResource, UserResource, MeResource, UserRecipeListResource, UserActivateResource,UserAvatarUploadResource
 from resources.recipe import RecipeListResource, RecipeResource, RecipePublishResource, RecipeCoverUploadResource
@@ -27,6 +27,7 @@ def register_extensions(app):
     jwt.init_app(app)
     configure_uploads(app,image_set)
     patch_request_class(app,10*1024*1024)
+    cache.init_app(app)
     
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blacklist(jwt_header, decrypted_token):
@@ -38,7 +39,19 @@ def register_extensions(app):
     #     token = db.session.query().filter_by(jti=jti).scalar()
     #     return token is not None
     
+    @app.before_request
+    def before_request():
+        print('\n====================BEFORE REQUEST====================\n')
+        print(cache.cache._cache.keys())
+        print('\n======================================================\n')
     
+    @app.after_request
+    def after_request(response):
+        print('\n====================AFTER REQUEST====================\n')
+        print(cache.cache._cache.keys())
+        print('\n======================================================\n')
+        return response
+        
 def register_resources(app):
     api = Api(app)
     

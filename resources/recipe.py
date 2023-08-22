@@ -4,7 +4,7 @@ from http import HTTPStatus
 from models.recipe import Recipe
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from schemas.recipe import RecipeSchema, RecipePaginationSchema
-from extensions import image_set
+from extensions import image_set, cache
 from utils import save_image
 import os
 from webargs import fields
@@ -22,8 +22,10 @@ class RecipeListResource(Resource):
         'per_page':fields.Int(load_default=20),
         'sort':fields.Str(missing='created_at'),
         'order':fields.Str(missing='desc')
-        },location="query")
+        }, location="query")
+    @cache.cached(timeout=60, query_string=True)
     def get(self, q, page, per_page, sort, order):
+        print('Querying database...')
         if sort not in ['created_at', 'cook_time', 'num_of_servings']:
             sort = 'created_at'
         if order not in ['asc', 'desc']:
