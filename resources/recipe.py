@@ -5,7 +5,7 @@ from models.recipe import Recipe
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from schemas.recipe import RecipeSchema, RecipePaginationSchema
 from extensions import image_set, cache
-from utils import save_image
+from utils import save_image,clear_cache
 import os
 from webargs import fields
 from webargs.flaskparser import use_kwargs
@@ -98,6 +98,8 @@ class RecipeResource(Resource):
 
         recipe.directions = data.get('directions') or recipe.directions
         recipe.save()
+        
+        clear_cache('/recipes')
         return recipe_schema.dump(recipe), HTTPStatus.OK
        
 
@@ -128,6 +130,8 @@ class RecipeResource(Resource):
         if current_user != recipe.user_id:
             return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
         recipe.delete()
+        
+        clear_cache('/recipes')
         return {},HTTPStatus.NO_CONTENT
         
     
@@ -142,6 +146,8 @@ class RecipePublishResource(Resource):
             return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
         recipe.is_publish = True
         recipe.save()
+        
+        clear_cache('/recipes')
         return {}, HTTPStatus.NO_CONTENT
     
     def delete(self, recipe_id):
@@ -153,6 +159,8 @@ class RecipePublishResource(Resource):
             return {'message':'Access is not allowed'}, HTTPStatus.FORBIDDEN
         recipe.is_publish = False
         recipe.save()
+        
+        clear_cache('/recipes')
         return {}, HTTPStatus.NO_CONTENT
         
 class RecipeCoverUploadResource(Resource):
@@ -184,4 +192,5 @@ class RecipeCoverUploadResource(Resource):
         recipe.cover_image=filename
         recipe.save()
         
+        clear_cache('/recipes')
         return recipe_cover_schema.dump(recipe), HTTPStatus.OK
