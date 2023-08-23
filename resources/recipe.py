@@ -4,7 +4,7 @@ from http import HTTPStatus
 from models.recipe import Recipe
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from schemas.recipe import RecipeSchema, RecipePaginationSchema
-from extensions import image_set, cache
+from extensions import image_set, cache, limiter
 from utils import save_image,clear_cache
 import os
 from webargs import fields
@@ -16,6 +16,8 @@ recipe_cover_schema = RecipeSchema(only=('cover_url',))
 recipe_pagination_schema = RecipePaginationSchema()
 
 class RecipeListResource(Resource):
+    decorators = [limiter.limit('2 per minute', methods=['GET'],error_message='Too Many Requests')]
+    
     @use_kwargs({
         'q':fields.Str(load_default=''),
         'page':fields.Int(load_default=1),
