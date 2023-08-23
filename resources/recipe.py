@@ -16,7 +16,7 @@ recipe_cover_schema = RecipeSchema(only=('cover_url',))
 recipe_pagination_schema = RecipePaginationSchema()
 
 class RecipeListResource(Resource):
-    decorators = [limiter.limit('2 per minute', methods=['GET'],error_message='Too Many Requests')]
+    decorators = [limiter.limit('100 per minute', methods=['GET'],error_message='Too Many Requests')]
     
     @use_kwargs({
         'q':fields.Str(load_default=''),
@@ -32,6 +32,7 @@ class RecipeListResource(Resource):
             sort = 'created_at'
         if order not in ['asc', 'desc']:
             order = 'desc'
+            
         paginated_recipes = Recipe.get_all_published(q, page, per_page, sort, order)
         # print(q,page, per_page,'-----------------------')
         return recipe_pagination_schema.dump(paginated_recipes), HTTPStatus.OK
