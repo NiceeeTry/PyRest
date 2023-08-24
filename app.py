@@ -11,10 +11,18 @@ from resources.recipe import RecipeListResource, RecipeResource, RecipePublishRe
 from resources.token import TokenResource, RefreshResourse,RevokeResource, black_list
 from flask_uploads import configure_uploads, patch_request_class
 
+import os
 
 def create_app():
+    env = os.environ.get('ENV','Development')
+    if env=='Production':
+        config_str = 'config.ProductionConfig'
+    elif env == 'Staging':
+        config_str = 'config.StagingConfig'
+    else:
+        config_str = 'config.DevelopmentConfig'
     app =  Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_str)
     register_extensions(app)
     register_resources(app)
     return app
