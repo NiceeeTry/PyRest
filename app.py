@@ -13,14 +13,16 @@ from flask_uploads import configure_uploads, patch_request_class
 
 import os
 
-def create_app():
-    env = os.environ.get('ENV','Development')
-    if env=='Production':
-        config_str = 'config.ProductionConfig'
-    elif env == 'Staging':
-        config_str = 'config.StagingConfig'
-    else:
-        config_str = 'config.DevelopmentConfig'
+def create_app(config_str = 'config.DevelopmentConfig'):
+    # env = os.environ.get('ENV','Testing')
+    # if env=='Production':
+    #     config_str = 'config.ProductionConfig'
+    # elif env == 'Staging':
+    #     config_str = 'config.StagingConfig'
+    # elif env =='Testing':
+    #     config_str = 'config.TestConfig'
+    # else:
+    #     config_str = 'config.DevelopmentConfig'
     app =  Flask(__name__)
     app.config.from_object(config_str)
     register_extensions(app)
@@ -37,6 +39,8 @@ def register_extensions(app):
     patch_request_class(app,10*1024*1024)
     cache.init_app(app)
     limiter.init_app(app)
+    with app.app_context():
+        db.create_all()
     
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blacklist(jwt_header, decrypted_token):

@@ -14,7 +14,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY ='super-secret-key'
-    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:qwerty@:5436/smilecook'
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:qwerty@:5432/smilecook'
     
 class ProductionConfig(Config):
     SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -23,3 +23,9 @@ class ProductionConfig(Config):
 class StagingConfig(Config):
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    
+class TestConfig(Config):
+    SQLALCHEMY_DATABASE_URI =  SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:qwerty@:5432/testing'
+    SQLALCHEMY_ECHO=False
+    SECRET_KEY ='super-secret-key'
+    TESTING=True
